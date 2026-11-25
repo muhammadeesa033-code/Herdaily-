@@ -1,0 +1,2134 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HerDaily — Personal Planner & Lifestyle Tracker</title>
+  <style>
+    :root {
+      --bg: #fdf8f9;
+      --surface: #ffffff;
+      --surface-soft: #fff3f6;
+      --primary: #d95f8c;
+      --primary-dark: #b94470;
+      --primary-light: #fce4ec;
+      --secondary: #8c6bb1;
+      --secondary-light: #f1ebf8;
+      --accent: #4aa39a;
+      --accent-light: #e4f5f3;
+      --warn: #e29546;
+      --warn-light: #fdf1e4;
+      --danger: #d9534f;
+      --danger-light: #fbeae9;
+      --text: #2f242c;
+      --text-muted: #786972;
+      --border: #f0dfe6;
+      --shadow: 0 8px 24px rgba(180, 95, 130, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --nav-height: 68px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Noto Sans Arabic', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      padding-bottom: calc(var(--nav-height) + 20px);
+    }
+
+    html[dir="rtl"] body {
+      font-family: 'Noto Nastaliq Urdu', 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    /* Header */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 18px;
+    }
+
+    .header-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(217, 95, 140, 0.28);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .brand-date {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lang-btn {
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      color: var(--primary-dark);
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.86rem;
+      transition: all 0.2s ease;
+      min-height: 38px;
+    }
+
+    .lang-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* Desktop Top Nav */
+    .desktop-nav {
+      display: none;
+      max-width: 1120px;
+      margin: 14px auto 0;
+      padding: 0 18px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-pill {
+      border: 1px solid transparent;
+      background: var(--surface);
+      color: var(--text-muted);
+      padding: 9px 15px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+    }
+
+    .nav-pill:hover {
+      color: var(--primary);
+      border-color: var(--border);
+    }
+
+    .nav-pill.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(217, 95, 140, 0.25);
+    }
+
+    /* Main Container */
+    .main-container {
+      max-width: 1120px;
+      margin: 18px auto 0;
+      padding: 0 16px;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.22s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Cards & Grids */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, #d95f8c 0%, #9b6db7 100%);
+      color: #fff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .hero-banner h2 {
+      font-size: 1.35rem;
+      margin-bottom: 4px;
+    }
+
+    .hero-banner p {
+      opacity: 0.92;
+      font-size: 0.92rem;
+    }
+
+    .hero-pill {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      backdrop-filter: blur(6px);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .dash-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: start;
+    }
+
+    .dash-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+      box-shadow: 0 12px 26px rgba(217, 95, 140, 0.14);
+    }
+
+    .dash-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dash-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .icon-pink { background: var(--primary-light); color: var(--primary-dark); }
+    .icon-purple { background: var(--secondary-light); color: var(--secondary); }
+    .icon-teal { background: var(--accent-light); color: var(--accent); }
+    .icon-amber { background: var(--warn-light); color: var(--warn); }
+
+    .dash-label {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .dash-value {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .dash-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Water Widget */
+    .water-card {
+      background: linear-gradient(135deg, #f0fbfa 0%, #ffffff 100%);
+      border-color: #cdebe8;
+    }
+
+    .water-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .water-cups {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .cup-dot {
+      width: 30px;
+      height: 36px;
+      border-radius: 6px 6px 10px 10px;
+      border: 2px solid #9ad7d0;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 0.78rem;
+      transition: all 0.2s ease;
+    }
+
+    .cup-dot.filled {
+      background: #4aa39a;
+      border-color: #3a8b83;
+      color: #fff;
+    }
+
+    .water-btns {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .circle-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      font-size: 1.35rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .circle-btn:active {
+      transform: scale(0.94);
+    }
+
+    .circle-btn.minus {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .circle-btn.plus {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .water-count-badge {
+      font-size: 1.2rem;
+      font-weight: 700;
+      min-width: 72px;
+      text-align: center;
+      color: #2b6f68;
+    }
+
+    /* Forms & Inputs */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .input, .select, .textarea {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.94rem;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease;
+      min-height: 44px;
+    }
+
+    .input:focus, .select:focus, .textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 11px 18px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 44px;
+      transition: all 0.18s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-soft {
+      background: var(--surface-soft);
+      color: var(--primary-dark);
+    }
+
+    .btn-soft:hover {
+      background: var(--primary-light);
+    }
+
+    .btn-danger-soft {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .btn-sm {
+      padding: 7px 11px;
+      min-height: 36px;
+      font-size: 0.82rem;
+      border-radius: 9px;
+    }
+
+    /* Filter Tabs */
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-color: var(--primary);
+    }
+
+    /* Lists */
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      transition: background 0.15s ease;
+    }
+
+    .list-item.completed {
+      background: #faf6f8;
+      opacity: 0.78;
+    }
+
+    .list-item.completed .item-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .item-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .check-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      border: 2px solid var(--primary);
+      background: #fff;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .check-btn.checked {
+      background: var(--primary);
+    }
+
+    .item-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .item-title {
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .item-meta {
+      font-size: 0.79rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 3px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      background: var(--surface-soft);
+      color: var(--primary-dark);
+    }
+
+    .badge-high { background: var(--danger-light); color: var(--danger); }
+    .badge-medium { background: var(--warn-light); color: var(--warn); }
+    .badge-low { background: var(--accent-light); color: var(--accent); }
+
+    .item-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    /* Progress Bar */
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: var(--surface-soft);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    /* Habits Week Strip */
+    .habit-days {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .day-pill {
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 0.74rem;
+      background: #fff;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .day-pill.done {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Notes Grid */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .note-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 140px;
+    }
+
+    .note-pink { background: #fff5f8; }
+    .note-purple { background: #f7f3fc; }
+    .note-teal { background: #effaf8; }
+    .note-amber { background: #fff9ef; }
+
+    .note-title {
+      font-weight: 700;
+      margin-bottom: 5px;
+      word-break: break-word;
+    }
+
+    .note-text {
+      font-size: 0.89rem;
+      color: #463a42;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .note-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(0,0,0,0.06);
+      padding-top: 8px;
+    }
+
+    /* Budget Summary */
+    .budget-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .budget-box {
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .budget-box.income { background: var(--accent-light); border-color: #bfe6e2; }
+    .budget-box.expense { background: var(--danger-light); border-color: #f3c8c6; }
+    .budget-box.balance { background: var(--secondary-light); border-color: #ddd0ee; }
+
+    .budget-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .budget-amt {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .amt-plus { color: #2b7d75; font-weight: 700; }
+    .amt-minus { color: var(--danger); font-weight: 700; }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      background: #fffafb;
+    }
+
+    /* Bottom Mobile Nav */
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-height);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 4px 4px;
+      z-index: 60;
+      overflow-x: auto;
+    }
+
+    .mob-nav-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 6px 8px;
+      border-radius: 12px;
+      cursor: pointer;
+      min-width: 50px;
+      font-family: inherit;
+    }
+
+    .mob-nav-btn .ico {
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+
+    .mob-nav-btn.active {
+      color: var(--primary-dark);
+      background: var(--primary-light);
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(38, 22, 32, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #fff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: calc(var(--nav-height) + 14px);
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #2f242c;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 120;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (min-width: 820px) {
+      body {
+        padding-bottom: 32px;
+      }
+      .desktop-nav {
+        display: flex;
+      }
+      .mobile-nav {
+        display: none;
+      }
+      .toast {
+        bottom: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand" onclick="navigateTo('dashboard')" role="button" tabindex="0">
+        <div class="brand-logo">🌸</div>
+        <div>
+          <div class="brand-title" data-i18n="appName">HerDaily</div>
+          <div class="brand-date" id="todayDateLabel"></div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="lang-btn" id="langToggleBtn" type="button">اردو / EN</button>
+      </div>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <nav class="desktop-nav" aria-label="Primary Navigation">
+      <button class="nav-pill active" data-target="dashboard" type="button">🏠 <span data-i18n="navDashboard">Dashboard</span></button>
+      <button class="nav-pill" data-target="planner" type="button">📅 <span data-i18n="navPlanner">Daily Planner</span></button>
+      <button class="nav-pill" data-target="habits" type="button">✨ <span data-i18n="navHabits">Habits</span></button>
+      <button class="nav-pill" data-target="goals" type="button">🎯 <span data-i18n="navGoals">Weekly Goals</span></button>
+      <button class="nav-pill" data-target="notes" type="button">📝 <span data-i18n="navNotes">Notes</span></button>
+      <button class="nav-pill" data-target="shopping" type="button">🛍️ <span data-i18n="navShopping">Shopping</span></button>
+      <button class="nav-pill" data-target="budget" type="button">💰 <span data-i18n="navBudget">Budget</span></button>
+    </nav>
+  </header>
+
+  <main class="main-container">
+
+    <!-- DASHBOARD SECTION -->
+    <section id="section-dashboard" class="section active">
+      <div class="card hero-banner">
+        <div>
+          <h2 data-i18n="welcomeTitle">Welcome back, Beautiful!</h2>
+          <p data-i18n="welcomeSub">Organize your day, track your wellness, and stay on top of your goals.</p>
+        </div>
+        <div class="hero-pill" id="heroSummaryPill">0% Today</div>
+      </div>
+
+      <!-- Water Tracker Card on Dashboard -->
+      <div class="card water-card">
+        <div class="dash-top">
+          <div>
+            <div class="dash-label" data-i18n="waterTitle">Daily Water Intake</div>
+            <div class="dash-sub" data-i18n="waterGoalLabel">Goal: 8 glasses a day</div>
+          </div>
+          <div class="water-btns">
+            <button class="circle-btn minus" id="waterMinusBtn" type="button" aria-label="Decrease water">−</button>
+            <div class="water-count-badge" id="waterCountText">0 / 8</div>
+            <button class="circle-btn plus" id="waterPlusBtn" type="button" aria-label="Increase water">+</button>
+          </div>
+        </div>
+        <div class="water-cups" id="waterCupsVisual"></div>
+      </div>
+
+      <!-- Clickable Summary Cards -->
+      <div class="dashboard-grid">
+        <button class="dash-card" type="button" onclick="navigateTo('planner')">
+          <div class="dash-top">
+            <span class="dash-label" data-i18n="navPlanner">Daily Planner</span>
+            <span class="dash-icon icon-pink">📅</span>
+          </div>
+          <div class="dash-value" id="dashTasksVal">0 / 0</div>
+          <div class="dash-sub">
+            <span data-i18n="dashTasksSub">Tasks completed</span>
+            <span>→</span>
+          </div>
+        </button>
+
+        <button class="dash-card" type="button" onclick="navigateTo('habits')">
+          <div class="dash-top">
+            <span class="dash-label" data-i18n="navHabits">Habits</span>
+            <span class="dash-icon icon-purple">✨</span>
+          </div>
+          <div class="dash-value" id="dashHabitsVal">0 / 0</div>
+          <div class="dash-sub">
+            <span data-i18n="dashHabitsSub">Done today</span>
+            <span>→</span>
+          </div>
+        </button>
+
+        <button class="dash-card" type="button" onclick="navigateTo('goals')">
+          <div class="dash-top">
+            <span class="dash-label" data-i18n="navGoals">Weekly Goals</span>
+            <span class="dash-icon icon-amber">🎯</span>
+          </div>
+          <div class="dash-value" id="dashGoalsVal">0%</div>
+          <div class="dash-sub">
+            <span data-i18n="dashGoalsSub">Average progress</span>
+            <span>→</span>
+          </div>
+        </button>
+
+        <button class="dash-card" type="button" onclick="navigateTo('notes')">
+          <div class="dash-top">
+            <span class="dash-label" data-i18n="navNotes">Notes</span>
+            <span class="dash-icon icon-pink">📝</span>
+          </div>
+          <div class="dash-value" id="dashNotesVal">0</div>
+          <div class="dash-sub">
+            <span data-i18n="dashNotesSub">Saved notes</span>
+            <span>→</span>
+          </div>
+        </button>
+
+        <button class="dash-card" type="button" onclick="navigateTo('shopping')">
+          <div class="dash-top">
+            <span class="dash-label" data-i18n="navShopping">Shopping</span>
+            <span class="dash-icon icon-teal">🛍️</span>
+          </div>
+          <div class="dash-value" id="dashShopVal">0</div>
+          <div class="dash-sub">
+            <span data-i18n="dashShopSub">Items remaining</span>
+            <span>→</span>
+          </div>
+        </button>
+
+        <button class="dash-card" type="button" onclick="navigateTo('budget')">
+          <div class="dash-top">
+            <span class="dash-label" data-i18n="navBudget">Budget</span>
+            <span class="dash-icon icon-purple">💰</span>
+          </div>
+          <div class="dash-value" id="dashBudgetVal">Rs. 0</div>
+          <div class="dash-sub">
+            <span data-i18n="dashBudgetSub">Monthly balance</span>
+            <span>→</span>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- DAILY PLANNER SECTION -->
+    <section id="section-planner" class="section">
+      <div class="section-header">
+        <h2 class="section-title">📅 <span data-i18n="navPlanner">Daily Planner</span></h2>
+      </div>
+
+      <div class="card">
+        <form id="taskForm">
+          <div class="form-grid">
+            <input type="text" class="input" id="taskTitleInput" data-i18n-placeholder="taskPlaceholder" placeholder="Add a new task..." required />
+            <input type="time" class="input" id="taskTimeInput" />
+            <select class="select" id="taskPriorityInput">
+              <option value="medium" data-i18n="prioMedium">Medium Priority</option>
+              <option value="high" data-i18n="prioHigh">High Priority</option>
+              <option value="low" data-i18n="prioLow">Low Priority</option>
+            </select>
+            <button type="submit" class="btn btn-primary" data-i18n="addTaskBtn">+ Add Task</button>
+          </div>
+        </form>
+
+        <div class="filter-row" id="taskFilters">
+          <button type="button" class="chip active" data-filter="all" data-i18n="filterAll">All</button>
+          <button type="button" class="chip" data-filter="active" data-i18n="filterActive">Active</button>
+          <button type="button" class="chip" data-filter="completed" data-i18n="filterCompleted">Completed</button>
+        </div>
+
+        <div class="item-list" id="taskList"></div>
+      </div>
+    </section>
+
+    <!-- HABIT TRACKER SECTION -->
+    <section id="section-habits" class="section">
+      <div class="section-header">
+        <h2 class="section-title">✨ <span data-i18n="habitTitle">Habit Tracker</span></h2>
+      </div>
+
+      <div class="card">
+        <form id="habitForm" class="form-grid">
+          <input type="text" class="input" id="habitNameInput" data-i18n-placeholder="habitPlaceholder" placeholder="New daily habit (e.g. Skincare, Walk, Reading)..." required />
+          <button type="submit" class="btn btn-primary" data-i18n="addHabitBtn">+ Add Habit</button>
+        </form>
+
+        <div class="item-list" id="habitList"></div>
+      </div>
+    </section>
+
+    <!-- WEEKLY GOALS SECTION -->
+    <section id="section-goals" class="section">
+      <div class="section-header">
+        <h2 class="section-title">🎯 <span data-i18n="navGoals">Weekly Goals</span></h2>
+      </div>
+
+      <div class="card">
+        <form id="goalForm" class="form-grid">
+          <input type="text" class="input" id="goalTitleInput" data-i18n-placeholder="goalPlaceholder" placeholder="What do you want to achieve this week?" required />
+          <input type="number" class="input" id="goalTargetInput" min="1" max="100" value="5" data-i18n-placeholder="goalTargetPlaceholder" placeholder="Target steps" required />
+          <button type="submit" class="btn btn-primary" data-i18n="addGoalBtn">+ Add Goal</button>
+        </form>
+
+        <div class="item-list" id="goalList"></div>
+      </div>
+    </section>
+
+    <!-- PERSONAL NOTES SECTION -->
+    <section id="section-notes" class="section">
+      <div class="section-header">
+        <h2 class="section-title">📝 <span data-i18n="notesTitle">Personal Notes</span></h2>
+      </div>
+
+      <div class="card">
+        <form id="noteForm">
+          <div class="form-grid">
+            <input type="text" class="input" id="noteTitleInput" data-i18n-placeholder="noteTitlePlaceholder" placeholder="Note title..." required />
+            <select class="select" id="noteColorInput">
+              <option value="pink" data-i18n="colorPink">Rose Pink</option>
+              <option value="purple" data-i18n="colorPurple">Lavender</option>
+              <option value="teal" data-i18n="colorTeal">Mint Teal</option>
+              <option value="amber" data-i18n="colorAmber">Warm Peach</option>
+            </select>
+          </div>
+          <textarea class="textarea" id="noteBodyInput" data-i18n-placeholder="noteBodyPlaceholder" placeholder="Write your thoughts, reminders, or gratitude..." required></textarea>
+          <div style="margin-top: 10px;">
+            <button type="submit" class="btn btn-primary" data-i18n="addNoteBtn">+ Save Note</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="notes-grid" id="notesGrid"></div>
+    </section>
+
+    <!-- SHOPPING LIST SECTION -->
+    <section id="section-shopping" class="section">
+      <div class="section-header">
+        <h2 class="section-title">🛍️ <span data-i18n="shoppingTitle">Shopping List</span></h2>
+        <button type="button" class="btn btn-soft btn-sm" id="clearCheckedShopBtn" data-i18n="clearCheckedBtn">Clear Checked</button>
+      </div>
+
+      <div class="card">
+        <form id="shopForm" class="form-grid">
+          <input type="text" class="input" id="shopItemInput" data-i18n-placeholder="shopPlaceholder" placeholder="Item name (e.g. Milk, Moisturizer)..." required />
+          <input type="text" class="input" id="shopQtyInput" data-i18n-placeholder="shopQtyPlaceholder" placeholder="Qty (e.g. 2 pcs)" />
+          <button type="submit" class="btn btn-primary" data-i18n="addShopBtn">+ Add Item</button>
+        </form>
+
+        <div class="item-list" id="shopList"></div>
+      </div>
+    </section>
+
+    <!-- MONTHLY BUDGET SECTION -->
+    <section id="section-budget" class="section">
+      <div class="section-header">
+        <h2 class="section-title">💰 <span data-i18n="budgetTitle">Monthly Budget</span></h2>
+      </div>
+
+      <div class="budget-summary">
+        <div class="budget-box income">
+          <div class="budget-label" data-i18n="totalIncome">Total Income</div>
+          <div class="budget-amt" id="budgetIncomeTotal">Rs. 0</div>
+        </div>
+        <div class="budget-box expense">
+          <div class="budget-label" data-i18n="totalExpense">Total Expenses</div>
+          <div class="budget-amt" id="budgetExpenseTotal">Rs. 0</div>
+        </div>
+        <div class="budget-box balance">
+          <div class="budget-label" data-i18n="netBalance">Remaining Balance</div>
+          <div class="budget-amt" id="budgetBalanceTotal">Rs. 0</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <form id="budgetForm" class="form-grid">
+          <select class="select" id="budgetTypeInput">
+            <option value="expense" data-i18n="typeExpense">Expense</option>
+            <option value="income" data-i18n="typeIncome">Income</option>
+          </select>
+          <input type="text" class="input" id="budgetDescInput" data-i18n-placeholder="budgetDescPlaceholder" placeholder="Description (e.g. Salary, Groceries)..." required />
+          <input type="number" class="input" id="budgetAmountInput" min="1" step="any" data-i18n-placeholder="budgetAmountPlaceholder" placeholder="Amount" required />
+          <select class="select" id="budgetCatInput">
+            <option value="General" data-i18n="catGeneral">General</option>
+            <option value="Groceries" data-i18n="catGroceries">Groceries</option>
+            <option value="Beauty" data-i18n="catBeauty">Self-Care & Beauty</option>
+            <option value="Bills" data-i18n="catBills">Bills & Home</option>
+            <option value="Salary" data-i18n="catSalary">Salary / Allowance</option>
+          </select>
+          <button type="submit" class="btn btn-primary" data-i18n="addBudgetBtn">+ Add Entry</button>
+        </form>
+
+        <div class="item-list" id="budgetList"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="mobile-nav" aria-label="Mobile Navigation">
+    <button class="mob-nav-btn active" data-target="dashboard" type="button"><span class="ico">🏠</span><span data-i18n="mobHome">Home</span></button>
+    <button class="mob-nav-btn" data-target="planner" type="button"><span class="ico">📅</span><span data-i18n="mobPlan">Plan</span></button>
+    <button class="mob-nav-btn" data-target="habits" type="button"><span class="ico">✨</span><span data-i18n="mobHabits">Habits</span></button>
+    <button class="mob-nav-btn" data-target="goals" type="button"><span class="ico">🎯</span><span data-i18n="mobGoals">Goals</span></button>
+    <button class="mob-nav-btn" data-target="notes" type="button"><span class="ico">📝</span><span data-i18n="mobNotes">Notes</span></button>
+    <button class="mob-nav-btn" data-target="shopping" type="button"><span class="ico">🛍️</span><span data-i18n="mobShop">Shop</span></button>
+    <button class="mob-nav-btn" data-target="budget" type="button"><span class="ico">💰</span><span data-i18n="mobBudget">Budget</span></button>
+  </nav>
+
+  <!-- Edit Task Modal -->
+  <div class="modal-backdrop" id="editTaskModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3 class="modal-title" data-i18n="editTaskTitle">Edit Task</h3>
+      <form id="editTaskForm">
+        <input type="hidden" id="editTaskId" />
+        <div class="form-grid" style="grid-template-columns: 1fr;">
+          <input type="text" class="input" id="editTaskTitleInput" required />
+          <input type="time" class="input" id="editTaskTimeInput" />
+          <select class="select" id="editTaskPriorityInput">
+            <option value="medium" data-i18n="prioMedium">Medium Priority</option>
+            <option value="high" data-i18n="prioHigh">High Priority</option>
+            <option value="low" data-i18n="prioLow">Low Priority</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-soft" id="closeEditModalBtn" data-i18n="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" data-i18n="saveBtn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toastEl"></div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = 'herDailyApp_v1';
+      const WATER_GOAL = 8;
+
+      const translations = {
+        en: {
+          appName: 'HerDaily',
+          navDashboard: 'Dashboard',
+          navPlanner: 'Daily Planner',
+          navHabits: 'Habits',
+          navGoals: 'Weekly Goals',
+          navNotes: 'Notes',
+          navShopping: 'Shopping',
+          navBudget: 'Budget',
+          mobHome: 'Home',
+          mobPlan: 'Plan',
+          mobHabits: 'Habits',
+          mobGoals: 'Goals',
+          mobNotes: 'Notes',
+          mobShop: 'Shop',
+          mobBudget: 'Budget',
+          welcomeTitle: 'Welcome back, Beautiful!',
+          welcomeSub: 'Organize your day, track your wellness, and stay on top of your goals.',
+          waterTitle: 'Daily Water Intake',
+          waterGoalLabel: 'Goal: 8 glasses a day',
+          dashTasksSub: 'Tasks completed',
+          dashHabitsSub: 'Done today',
+          dashGoalsSub: 'Average progress',
+          dashNotesSub: 'Saved notes',
+          dashShopSub: 'Items remaining',
+          dashBudgetSub: 'Monthly balance',
+          taskPlaceholder: 'Add a new task...',
+          prioHigh: 'High Priority',
+          prioMedium: 'Medium Priority',
+          prioLow: 'Low Priority',
+          addTaskBtn: '+ Add Task',
+          filterAll: 'All',
+          filterActive: 'Active',
+          filterCompleted: 'Completed',
+          emptyTasks: 'No tasks yet. Add your first task above!',
+          habitTitle: 'Habit Tracker',
+          habitPlaceholder: 'New daily habit (e.g. Skincare, Walk, Reading)...',
+          addHabitBtn: '+ Add Habit',
+          emptyHabits: 'No habits yet. Start building a healthy routine!',
+          doneToday: 'Done Today',
+          markToday: 'Mark Today',
+          streakLabel: 'Streak',
+          daysLabel: 'days',
+          goalPlaceholder: 'What do you want to achieve this week?',
+          goalTargetPlaceholder: 'Target steps',
+          addGoalBtn: '+ Add Goal',
+          emptyGoals: 'No weekly goals yet. Set an inspiring goal!',
+          notesTitle: 'Personal Notes',
+          noteTitlePlaceholder: 'Note title...',
+          noteBodyPlaceholder: 'Write your thoughts, reminders, or gratitude...',
+          colorPink: 'Rose Pink',
+          colorPurple: 'Lavender',
+          colorTeal: 'Mint Teal',
+          colorAmber: 'Warm Peach',
+          addNoteBtn: '+ Save Note',
+          emptyNotes: 'No notes yet. Capture your thoughts anytime!',
+          shoppingTitle: 'Shopping List',
+          clearCheckedBtn: 'Clear Checked',
+          shopPlaceholder: 'Item name (e.g. Milk, Moisturizer)...',
+          shopQtyPlaceholder: 'Qty (e.g. 2 pcs)',
+          addShopBtn: '+ Add Item',
+          emptyShop: 'Your shopping list is empty.',
+          budgetTitle: 'Monthly Budget',
+          totalIncome: 'Total Income',
+          totalExpense: 'Total Expenses',
+          netBalance: 'Remaining Balance',
+          typeExpense: 'Expense',
+          typeIncome: 'Income',
+          budgetDescPlaceholder: 'Description (e.g. Salary, Groceries)...',
+          budgetAmountPlaceholder: 'Amount',
+          catGeneral: 'General',
+          catGroceries: 'Groceries',
+          catBeauty: 'Self-Care & Beauty',
+          catBills: 'Bills & Home',
+          catSalary: 'Salary / Allowance',
+          addBudgetBtn: '+ Add Entry',
+          emptyBudget: 'No budget entries yet. Add income or expenses above.',
+          editTaskTitle: 'Edit Task',
+          cancelBtn: 'Cancel',
+          saveBtn: 'Save Changes',
+          editBtn: 'Edit',
+          deleteBtn: 'Delete',
+          currency: 'Rs.',
+          todayProgress: 'Today',
+          toastSaved: 'Saved!',
+          toastDeleted: 'Deleted',
+          toastLang: 'Switched to English'
+        },
+        ur: {
+          appName: 'ہر ڈیلی',
+          navDashboard: 'ڈیش بورڈ',
+          navPlanner: 'روزانہ پلانر',
+          navHabits: 'عادات',
+          navGoals: 'ہفتہ وار اہداف',
+          navNotes: 'ذاتی نوٹس',
+          navShopping: 'خریداری کی فہرست',
+          navBudget: 'ماہانہ بجٹ',
+          mobHome: 'ہوم',
+          mobPlan: 'پلانر',
+          mobHabits: 'عادات',
+          mobGoals: 'اہداف',
+          mobNotes: 'نوٹس',
+          mobShop: 'خریداری',
+          mobBudget: 'بجٹ',
+          welcomeTitle: 'خوش آمدید!',
+          welcomeSub: 'اپنا دن منظم کریں، صحت کا خیال رکھیں اور اپنے اہداف حاصل کریں۔',
+          waterTitle: 'روزانہ پانی کا استعمال',
+          waterGoalLabel: 'ہدف: روزانہ 8 گلاس پانی',
+          dashTasksSub: 'مکمل شدہ کام',
+          dashHabitsSub: 'آج مکمل',
+          dashGoalsSub: 'اوسط پیش رفت',
+          dashNotesSub: 'محفوظ نوٹس',
+          dashShopSub: 'باقی اشیاء',
+          dashBudgetSub: 'ماہانہ بیلنس',
+          taskPlaceholder: 'نیا کام لکھیں...',
+          prioHigh: 'زیادہ اہمیت',
+          prioMedium: 'درمیانی اہمیت',
+          prioLow: 'کم اہمیت',
+          addTaskBtn: '+ کام شامل کریں',
+          filterAll: 'تمام',
+          filterActive: 'جاری',
+          filterCompleted: 'مکمل',
+          emptyTasks: 'ابھی کوئی کام نہیں ہے۔ اوپر نیا کام شامل کریں!',
+          habitTitle: 'عادات ٹریکر',
+          habitPlaceholder: 'نئی روزانہ عادت (مثلاً چہل قدمی، مطالعہ)...',
+          addHabitBtn: '+ عادت شامل کریں',
+          emptyHabits: 'ابھی کوئی عادت شامل نہیں ہے۔ آج ہی شروع کریں!',
+          doneToday: 'آج مکمل',
+          markToday: 'آج نشان لگائیں',
+          streakLabel: 'مسلسل',
+          daysLabel: 'دن',
+          goalPlaceholder: 'اس ہفتے آپ کیا حاصل کرنا چاہتی ہیں؟',
+          goalTargetPlaceholder: 'ہدف کے مراحل',
+          addGoalBtn: '+ ہدف شامل کریں',
+          emptyGoals: 'ابھی کوئی ہفتہ وار ہدف نہیں ہے۔ نیا ہدف مقرر کریں!',
+          notesTitle: 'ذاتی نوٹس',
+          noteTitlePlaceholder: 'نوٹ کا عنوان...',
+          noteBodyPlaceholder: 'اپنے خیالات، یاددہانی یا شکرگزاری لکھیں...',
+          colorPink: 'گلابِی',
+          colorPurple: 'لیوینڈر',
+          colorTeal: 'سبز مائل',
+          colorAmber: 'آڑو رنگ',
+          addNoteBtn: '+ نوٹ محفوظ کریں',
+          emptyNotes: 'ابھی کوئی نوٹ نہیں ہے۔ اپنے خیالات محفوظ کریں!',
+          shoppingTitle: 'خریداری کی فہرست',
+          clearCheckedBtn: 'مکمل ہٹائیں',
+          shopPlaceholder: 'چیز کا نام (مثلاً دودھ، کریم)...',
+          shopQtyPlaceholder: 'تعداد (مثلاً 2 عدد)',
+          addShopBtn: '+ شامل کریں',
+          emptyShop: 'خریداری کی فہرست خالی ہے۔',
+          budgetTitle: 'ماہانہ بجٹ',
+          totalIncome: 'کل آمدنی',
+          totalExpense: 'کل اخراجات',
+          netBalance: 'باقی رقم',
+          typeExpense: 'خرچ',
+          typeIncome: 'آمدنی',
+          budgetDescPlaceholder: 'تفصیل (مثلاً تنخواہ، راشن)...',
+          budgetAmountPlaceholder: 'رقم',
+          catGeneral: 'عام',
+          catGroceries: 'راشن و سودا سلف',
+          catBeauty: 'ذاتی دیکھ بھال',
+          catBills: 'بل اور گھر',
+          catSalary: 'تنخواہ / جیب خرچ',
+          addBudgetBtn: '+ اندراج کریں',
+          emptyBudget: 'بجٹ کا کوئی اندراج نہیں ہے۔ اوپر آمدنی یا خرچ شامل کریں۔',
+          editTaskTitle: 'کام میں ترمیم کریں',
+          cancelBtn: 'منسوخ',
+          saveBtn: 'محفوظ کریں',
+          editBtn: 'ترمیم',
+          deleteBtn: 'حذف',
+          currency: 'روپے',
+          todayProgress: 'آج',
+          toastSaved: 'محفوظ ہو گیا!',
+          toastDeleted: 'حذف کر دیا گیا',
+          toastLang: 'اردو زبان فعال ہو گئی'
+        }
+      };
+
+      function getTodayKey() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      }
+
+      function getLast7Days() {
+        const days = [];
+        const base = new Date();
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(base);
+          d.setDate(base.getDate() - i);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          days.push({
+            key: `${y}-${m}-${day}`,
+            short: d.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2)
+          });
+        }
+        return days;
+      }
+
+      function defaultState() {
+        return {
+          lang: 'en',
+          activeSection: 'dashboard',
+          taskFilter: 'all',
+          waterByDate: {},
+          tasks: [],
+          habits: [],
+          goals: [],
+          notes: [],
+          shopping: [],
+          budget: []
+        };
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return defaultState();
+          const parsed = JSON.parse(raw);
+          return Object.assign(defaultState(), parsed);
+        } catch (e) {
+          return defaultState();
+        }
+      }
+
+      let state = loadState();
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          // ignore quota error
+        }
+      }
+
+      function t(key) {
+        return (translations[state.lang] && translations[state.lang][key]) || translations.en[key] || key;
+      }
+
+      function esc(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function uid() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      }
+
+      let toastTimer = null;
+      function showToast(msg) {
+        const el = document.getElementById('toastEl');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+      }
+
+      function formatMoney(amount) {
+        const num = Number(amount) || 0;
+        const formatted = num.toLocaleString('en-US', { maximumFractionDigits: 2 });
+        return state.lang === 'ur' ? `${formatted} ${t('currency')}` : `${t('currency')} ${formatted}`;
+      }
+
+      function updateDateHeader() {
+        const d = new Date();
+        const locale = state.lang === 'ur' ? 'ur-PK' : 'en-US';
+        document.getElementById('todayDateLabel').textContent = d.toLocaleDateString(locale, {
+          weekday: 'long',
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      }
+
+      function applyLanguage() {
+        document.documentElement.lang = state.lang;
+        document.documentElement.dir = state.lang === 'ur' ? 'rtl' : 'ltr';
+        document.getElementById('langToggleBtn').textContent = state.lang === 'en' ? 'اردو' : 'English';
+
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+          const key = el.getAttribute('data-i18n');
+          el.textContent = t(key);
+        });
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+          const key = el.getAttribute('data-i18n-placeholder');
+          el.placeholder = t(key);
+        });
+
+        updateDateHeader();
+        renderAll();
+      }
+
+      window.navigateTo = function (sectionId) {
+        state.activeSection = sectionId;
+        saveState();
+
+        document.querySelectorAll('.section').forEach((sec) => {
+          sec.classList.toggle('active', sec.id === `section-${sectionId}`);
+        });
+
+        document.querySelectorAll('.nav-pill, .mob-nav-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.getAttribute('data-target') === sectionId);
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      // Bind Nav Buttons
+      document.querySelectorAll('.nav-pill, .mob-nav-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          navigateTo(btn.getAttribute('data-target'));
+        });
+      });
+
+      // Language Toggle
+      document.getElementById('langToggleBtn').addEventListener('click', () => {
+        state.lang = state.lang === 'en' ? 'ur' : 'en';
+        saveState();
+        applyLanguage();
+        showToast(t('toastLang'));
+      });
+
+      // ---------------- WATER TRACKER ----------------
+      function getTodayWater() {
+        return Number(state.waterByDate[getTodayKey()] || 0);
+      }
+
+      function changeWater(delta) {
+        const key = getTodayKey();
+        const curr = getTodayWater();
+        const next = Math.max(0, Math.min(16, curr + delta));
+        state.waterByDate[key] = next;
+        saveState();
+        renderWater();
+        renderDashboard();
+      }
+
+      document.getElementById('waterPlusBtn').addEventListener('click', () => changeWater(1));
+      document.getElementById('waterMinusBtn').addEventListener('click', () => changeWater(-1));
+
+      function renderWater() {
+        const count = getTodayWater();
+        document.getElementById('waterCountText').textContent = `${count} / ${WATER_GOAL}`;
+        const container = document.getElementById('waterCupsVisual');
+        let html = '';
+        const totalShow = Math.max(WATER_GOAL, count);
+        for (let i = 1; i <= totalShow; i++) {
+          html += `<div class="cup-dot ${i <= count ? 'filled' : ''}">💧</div>`;
+        }
+        container.innerHTML = html;
+      }
+
+      // ---------------- DAILY PLANNER ----------------
+      document.getElementById('taskForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('taskTitleInput').value.trim();
+        if (!title) return;
+        const time = document.getElementById('taskTimeInput').value;
+        const priority = document.getElementById('taskPriorityInput').value;
+
+        state.tasks.unshift({
+          id: uid(),
+          title,
+          time,
+          priority,
+          completed: false
+        });
+        saveState();
+        e.target.reset();
+        renderTasks();
+        renderDashboard();
+        showToast(t('toastSaved'));
+      });
+
+      document.getElementById('taskFilters').addEventListener('click', (e) => {
+        const btn = e.target.closest('.chip');
+        if (!btn) return;
+        state.taskFilter = btn.getAttribute('data-filter');
+        saveState();
+        renderTasks();
+      });
+
+      function openEditTaskModal(taskId) {
+        const task = state.tasks.find((x) => x.id === taskId);
+        if (!task) return;
+        document.getElementById('editTaskId').value = task.id;
+        document.getElementById('editTaskTitleInput').value = task.title;
+        document.getElementById('editTaskTimeInput').value = task.time || '';
+        document.getElementById('editTaskPriorityInput').value = task.priority || 'medium';
+        document.getElementById('editTaskModal').classList.add('open');
+      }
+
+      function closeEditTaskModal() {
+        document.getElementById('editTaskModal').classList.remove('open');
+      }
+
+      document.getElementById('closeEditModalBtn').addEventListener('click', closeEditTaskModal);
+      document.getElementById('editTaskModal').addEventListener('click', (e) => {
+        if (e.target.id === 'editTaskModal') closeEditTaskModal();
+      });
+
+      document.getElementById('editTaskForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editTaskId').value;
+        const task = state.tasks.find((x) => x.id === id);
+        if (task) {
+          task.title = document.getElementById('editTaskTitleInput').value.trim() || task.title;
+          task.time = document.getElementById('editTaskTimeInput').value;
+          task.priority = document.getElementById('editTaskPriorityInput').value;
+          saveState();
+          renderTasks();
+          renderDashboard();
+          showToast(t('toastSaved'));
+        }
+        closeEditTaskModal();
+      });
+
+      function renderTasks() {
+        document.querySelectorAll('#taskFilters .chip').forEach((c) => {
+          c.classList.toggle('active', c.getAttribute('data-filter') === state.taskFilter);
+        });
+
+        const filtered = state.tasks.filter((task) => {
+          if (state.taskFilter === 'active') return !task.completed;
+          if (state.taskFilter === 'completed') return task.completed;
+          return true;
+        });
+
+        const list = document.getElementById('taskList');
+        if (!filtered.length) {
+          list.innerHTML = `<div class="empty-state">${esc(t('emptyTasks'))}</div>`;
+          return;
+        }
+
+        list.innerHTML = filtered.map((task) => {
+          const prioClass = task.priority === 'high' ? 'badge-high' : task.priority === 'low' ? 'badge-low' : 'badge-medium';
+          const prioText = task.priority === 'high' ? t('prioHigh') : task.priority === 'low' ? t('prioLow') : t('prioMedium');
+          return `
+            <div class="list-item ${task.completed ? 'completed' : ''}" data-task-id="${esc(task.id)}">
+              <div class="item-left">
+                <button type="button" class="check-btn ${task.completed ? 'checked' : ''}" data-action="toggle-task" aria-label="Toggle task">
+                  ${task.completed ? '✓' : ''}
+                </button>
+                <div class="item-body">
+                  <div class="item-title">${esc(task.title)}</div>
+                  <div class="item-meta">
+                    ${task.time ? `<span>🕒 ${esc(task.time)}</span>` : ''}
+                    <span class="badge ${prioClass}">${esc(prioText)}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="item-actions">
+                <button type="button" class="btn btn-soft btn-sm" data-action="edit-task">${esc(t('editBtn'))}</button>
+                <button type="button" class="btn btn-danger-soft btn-sm" data-action="delete-task">${esc(t('deleteBtn'))}</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('taskList').addEventListener('click', (e) => {
+        const item = e.target.closest('[data-task-id]');
+        if (!item) return;
+        const id = item.getAttribute('data-task-id');
+        const actionBtn = e.target.closest('[data-action]');
+        if (!actionBtn) return;
+        const action = actionBtn.getAttribute('data-action');
+
+        if (action === 'toggle-task') {
+          const task = state.tasks.find((x) => x.id === id);
+          if (task) {
+            task.completed = !task.completed;
+            saveState();
+            renderTasks();
+            renderDashboard();
+          }
+        } else if (action === 'edit-task') {
+          openEditTaskModal(id);
+        } else if (action === 'delete-task') {
+          state.tasks = state.tasks.filter((x) => x.id !== id);
+          saveState();
+          renderTasks();
+          renderDashboard();
+          showToast(t('toastDeleted'));
+        }
+      });
+
+      // ---------------- HABIT TRACKER ----------------
+      document.getElementById('habitForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('habitNameInput').value.trim();
+        if (!name) return;
+        state.habits.unshift({
+          id: uid(),
+          name,
+          dates: {}
+        });
+        saveState();
+        e.target.reset();
+        renderHabits();
+        renderDashboard();
+        showToast(t('toastSaved'));
+      });
+
+      function calcStreak(datesObj) {
+        let streak = 0;
+        const d = new Date();
+        for (let i = 0; i < 365; i++) {
+          const check = new Date(d);
+          check.setDate(d.getDate() - i);
+          const k = `${check.getFullYear()}-${String(check.getMonth() + 1).padStart(2, '0')}-${String(check.getDate()).padStart(2, '0')}`;
+          if (datesObj && datesObj[k]) {
+            streak++;
+          } else {
+            if (i === 0) continue; // if today not done yet, check yesterday
+            break;
+          }
+        }
+        return streak;
+      }
+
+      function renderHabits() {
+        const list = document.getElementById('habitList');
+        if (!state.habits.length) {
+          list.innerHTML = `<div class="empty-state">${esc(t('emptyHabits'))}</div>`;
+          return;
+        }
+
+        const todayKey = getTodayKey();
+        const last7 = getLast7Days();
+
+        list.innerHTML = state.habits.map((h) => {
+          const doneToday = !!(h.dates && h.dates[todayKey]);
+          const streak = calcStreak(h.dates);
+          const daysHtml = last7.map((d) => {
+            const done = !!(h.dates && h.dates[d.key]);
+            return `<button type="button" class="day-pill ${done ? 'done' : ''}" data-action="toggle-habit-day" data-day="${d.key}">${esc(d.short)}</button>`;
+          }).join('');
+
+          return `
+            <div class="list-item" data-habit-id="${esc(h.id)}">
+              <div class="item-body">
+                <div class="item-title">${esc(h.name)}</div>
+                <div class="item-meta">
+                  <span class="badge">🔥 ${esc(t('streakLabel'))}: ${streak} ${esc(t('daysLabel'))}</span>
+                </div>
+                <div class="habit-days">${daysHtml}</div>
+              </div>
+              <div class="item-actions">
+                <button type="button" class="btn btn-sm ${doneToday ? 'btn-primary' : 'btn-soft'}" data-action="toggle-habit-today">
+                  ${doneToday ? '✓ ' + esc(t('doneToday')) : esc(t('markToday'))}
+                </button>
+                <button type="button" class="btn btn-danger-soft btn-sm" data-action="delete-habit">${esc(t('deleteBtn'))}</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('habitList').addEventListener('click', (e) => {
+        const item = e.target.closest('[data-habit-id]');
+        if (!item) return;
+        const id = item.getAttribute('data-habit-id');
+        const habit = state.habits.find((x) => x.id === id);
+        if (!habit) return;
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const action = btn.getAttribute('data-action');
+
+        if (action === 'toggle-habit-today') {
+          const k = getTodayKey();
+          habit.dates = habit.dates || {};
+          habit.dates[k] = !habit.dates[k];
+          saveState();
+          renderHabits();
+          renderDashboard();
+        } else if (action === 'toggle-habit-day') {
+          const dayKey = btn.getAttribute('data-day');
+          habit.dates = habit.dates || {};
+          habit.dates[dayKey] = !habit.dates[dayKey];
+          saveState();
+          renderHabits();
+          renderDashboard();
+        } else if (action === 'delete-habit') {
+          state.habits = state.habits.filter((x) => x.id !== id);
+          saveState();
+          renderHabits();
+          renderDashboard();
+          showToast(t('toastDeleted'));
+        }
+      });
+
+      // ---------------- WEEKLY GOALS ----------------
+      document.getElementById('goalForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('goalTitleInput').value.trim();
+        const target = Math.max(1, parseInt(document.getElementById('goalTargetInput').value, 10) || 1);
+        if (!title) return;
+        state.goals.unshift({
+          id: uid(),
+          title,
+          current: 0,
+          target
+        });
+        saveState();
+        e.target.reset();
+        document.getElementById('goalTargetInput').value = 5;
+        renderGoals();
+        renderDashboard();
+        showToast(t('toastSaved'));
+      });
+
+      function renderGoals() {
+        const list = document.getElementById('goalList');
+        if (!state.goals.length) {
+          list.innerHTML = `<div class="empty-state">${esc(t('emptyGoals'))}</div>`;
+          return;
+        }
+
+        list.innerHTML = state.goals.map((g) => {
+          const pct = Math.min(100, Math.round((g.current / g.target) * 100));
+          return `
+            <div class="list-item" data-goal-id="${esc(g.id)}">
+              <div class="item-body">
+                <div class="item-title">${esc(g.title)} ${pct === 100 ? '🎉' : ''}</div>
+                <div class="item-meta">
+                  <span>${g.current} / ${g.target} (${pct}%)</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" style="width: ${pct}%"></div>
+                </div>
+              </div>
+              <div class="item-actions">
+                <button type="button" class="btn btn-soft btn-sm" data-action="goal-dec">−</button>
+                <button type="button" class="btn btn-primary btn-sm" data-action="goal-inc">+</button>
+                <button type="button" class="btn btn-danger-soft btn-sm" data-action="goal-del">${esc(t('deleteBtn'))}</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('goalList').addEventListener('click', (e) => {
+        const item = e.target.closest('[data-goal-id]');
+        if (!item) return;
+        const id = item.getAttribute('data-goal-id');
+        const goal = state.goals.find((x) => x.id === id);
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const action = btn.getAttribute('data-action');
+
+        if (action === 'goal-inc' && goal) {
+          goal.current = Math.min(goal.target, goal.current + 1);
+          saveState();
+          renderGoals();
+          renderDashboard();
+        } else if (action === 'goal-dec' && goal) {
+          goal.current = Math.max(0, goal.current - 1);
+          saveState();
+          renderGoals();
+          renderDashboard();
+        } else if (action === 'goal-del') {
+          state.goals = state.goals.filter((x) => x.id !== id);
+          saveState();
+          renderGoals();
+          renderDashboard();
+          showToast(t('toastDeleted'));
+        }
+      });
+
+      // ---------------- PERSONAL NOTES ----------------
+      document.getElementById('noteForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('noteTitleInput').value.trim();
+        const body = document.getElementById('noteBodyInput').value.trim();
+        const color = document.getElementById('noteColorInput').value;
+        if (!title || !body) return;
+
+        state.notes.unshift({
+          id: uid(),
+          title,
+          body,
+          color,
+          createdAt: new Date().toLocaleDateString()
+        });
+        saveState();
+        e.target.reset();
+        renderNotes();
+        renderDashboard();
+        showToast(t('toastSaved'));
+      });
+
+      function renderNotes() {
+        const grid = document.getElementById('notesGrid');
+        if (!state.notes.length) {
+          grid.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;">${esc(t('emptyNotes'))}</div>`;
+          return;
+        }
+
+        grid.innerHTML = state.notes.map((n) => `
+          <div class="note-card note-${esc(n.color || 'pink')}" data-note-id="${esc(n.id)}">
+            <div>
+              <div class="note-title">${esc(n.title)}</div>
+              <div class="note-text">${esc(n.body)}</div>
+            </div>
+            <div class="note-footer">
+              <span>${esc(n.createdAt || '')}</span>
+              <button type="button" class="btn btn-danger-soft btn-sm" data-action="delete-note">${esc(t('deleteBtn'))}</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('notesGrid').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action="delete-note"]');
+        if (!btn) return;
+        const card = e.target.closest('[data-note-id]');
+        if (!card) return;
+        const id = card.getAttribute('data-note-id');
+        state.notes = state.notes.filter((x) => x.id !== id);
+        saveState();
+        renderNotes();
+        renderDashboard();
+        showToast(t('toastDeleted'));
+      });
+
+      // ---------------- SHOPPING LIST ----------------
+      document.getElementById('shopForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('shopItemInput').value.trim();
+        const qty = document.getElementById('shopQtyInput').value.trim();
+        if (!name) return;
+
+        state.shopping.unshift({
+          id: uid(),
+          name,
+          qty,
+          checked: false
+        });
+        saveState();
+        e.target.reset();
+        renderShopping();
+        renderDashboard();
+        showToast(t('toastSaved'));
+      });
+
+      document.getElementById('clearCheckedShopBtn').addEventListener('click', () => {
+        const before = state.shopping.length;
+        state.shopping = state.shopping.filter((x) => !x.checked);
+        if (state.shopping.length !== before) {
+          saveState();
+          renderShopping();
+          renderDashboard();
+          showToast(t('toastDeleted'));
+        }
+      });
+
+      function renderShopping() {
+        const list = document.getElementById('shopList');
+        if (!state.shopping.length) {
+          list.innerHTML = `<div class="empty-state">${esc(t('emptyShop'))}</div>`;
+          return;
+        }
+
+        list.innerHTML = state.shopping.map((item) => `
+          <div class="list-item ${item.checked ? 'completed' : ''}" data-shop-id="${esc(item.id)}">
+            <div class="item-left">
+              <button type="button" class="check-btn ${item.checked ? 'checked' : ''}" data-action="toggle-shop" aria-label="Check item">
+                ${item.checked ? '✓' : ''}
+              </button>
+              <div class="item-body">
+                <div class="item-title">${esc(item.name)}</div>
+                ${item.qty ? `<div class="item-meta"><span>${esc(item.qty)}</span></div>` : ''}
+              </div>
+            </div>
+            <div class="item-actions">
+              <button type="button" class="btn btn-danger-soft btn-sm" data-action="delete-shop">${esc(t('deleteBtn'))}</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('shopList').addEventListener('click', (e) => {
+        const row = e.target.closest('[data-shop-id]');
+        if (!row) return;
+        const id = row.getAttribute('data-shop-id');
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const action = btn.getAttribute('data-action');
+
+        if (action === 'toggle-shop') {
+          const item = state.shopping.find((x) => x.id === id);
+          if (item) {
+            item.checked = !item.checked;
+            saveState();
+            renderShopping();
+            renderDashboard();
+          }
+        } else if (action === 'delete-shop') {
+          state.shopping = state.shopping.filter((x) => x.id !== id);
+          saveState();
+          renderShopping();
+          renderDashboard();
+          showToast(t('toastDeleted'));
+        }
+      });
+
+      // ---------------- MONTHLY BUDGET ----------------
+      document.getElementById('budgetForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const type = document.getElementById('budgetTypeInput').value;
+        const desc = document.getElementById('budgetDescInput').value.trim();
+        const amount = parseFloat(document.getElementById('budgetAmountInput').value);
+        const category = document.getElementById('budgetCatInput').value;
+        if (!desc || isNaN(amount) || amount <= 0) return;
+
+        state.budget.unshift({
+          id: uid(),
+          type,
+          desc,
+          amount,
+          category,
+          date: new Date().toLocaleDateString()
+        });
+        saveState();
+        e.target.reset();
+        renderBudget();
+        renderDashboard();
+        showToast(t('toastSaved'));
+      });
+
+      function calcBudgetTotals() {
+        let income = 0;
+        let expense = 0;
+        state.budget.forEach((b) => {
+          if (b.type === 'income') income += Number(b.amount) || 0;
+          else expense += Number(b.amount) || 0;
+        });
+        return { income, expense, balance: income - expense };
+      }
+
+      function renderBudget() {
+        const { income, expense, balance } = calcBudgetTotals();
+        document.getElementById('budgetIncomeTotal').textContent = formatMoney(income);
+        document.getElementById('budgetExpenseTotal').textContent = formatMoney(expense);
+        document.getElementById('budgetBalanceTotal').textContent = formatMoney(balance);
+
+        const list = document.getElementById('budgetList');
+        if (!state.budget.length) {
+          list.innerHTML = `<div class="empty-state">${esc(t('emptyBudget'))}</div>`;
+          return;
+        }
+
+        const catMap = {
+          General: t('catGeneral'),
+          Groceries: t('catGroceries'),
+          Beauty: t('catBeauty'),
+          Bills: t('catBills'),
+          Salary: t('catSalary')
+        };
+
+        list.innerHTML = state.budget.map((b) => `
+          <div class="list-item" data-budget-id="${esc(b.id)}">
+            <div class="item-body">
+              <div class="item-title">${esc(b.desc)}</div>
+              <div class="item-meta">
+                <span class="badge">${esc(catMap[b.category] || b.category)}</span>
+                <span>${esc(b.date || '')}</span>
+              </div>
+            </div>
+            <div class="item-actions">
+              <span class="${b.type === 'income' ? 'amt-plus' : 'amt-minus'}">
+                ${b.type === 'income' ? '+' : '−'} ${esc(formatMoney(b.amount))}
+              </span>
+              <button type="button" class="btn btn-danger-soft btn-sm" data-action="delete-budget">${esc(t('deleteBtn'))}</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('budgetList').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action="delete-budget"]');
+        if (!btn) return;
+        const row = e.target.closest('[data-budget-id]');
+        if (!row) return;
+        const id = row.getAttribute('data-budget-id');
+        state.budget = state.budget.filter((x) => x.id !== id);
+        saveState();
+        renderBudget();
+        renderDashboard();
+        showToast(t('toastDeleted'));
+      });
+
+      // ---------------- DASHBOARD SUMMARY ----------------
+      function renderDashboard() {
+        const totalTasks = state.tasks.length;
+        const doneTasks = state.tasks.filter((x) => x.completed).length;
+        document.getElementById('dashTasksVal').textContent = `${doneTasks} / ${totalTasks}`;
+
+        const todayKey = getTodayKey();
+        const totalHabits = state.habits.length;
+        const doneHabits = state.habits.filter((h) => h.dates && h.dates[todayKey]).length;
+        document.getElementById('dashHabitsVal').textContent = `${doneHabits} / ${totalHabits}`;
+
+        let avgGoal = 0;
+        if (state.goals.length) {
+          const sum = state.goals.reduce((acc, g) => acc + Math.min(1, g.current / g.target), 0);
+          avgGoal = Math.round((sum / state.goals.length) * 100);
+        }
+        document.getElementById('dashGoalsVal').textContent = `${avgGoal}%`;
+
+        document.getElementById('dashNotesVal').textContent = String(state.notes.length);
+
+        const remainingShop = state.shopping.filter((x) => !x.checked).length;
+        document.getElementById('dashShopVal').textContent = String(remainingShop);
+
+        const { balance } = calcBudgetTotals();
+        document.getElementById('dashBudgetVal').textContent = formatMoney(balance);
+
+        // Hero Daily Score
+        const waterPct = Math.min(1, getTodayWater() / WATER_GOAL);
+        const taskPct = totalTasks ? doneTasks / totalTasks : 0;
+        const habitPct = totalHabits ? doneHabits / totalHabits : 0;
+        const activeMetrics = [waterPct];
+        if (totalTasks) activeMetrics.push(taskPct);
+        if (totalHabits) activeMetrics.push(habitPct);
+        const heroPct = Math.round((activeMetrics.reduce((a, b) => a + b, 0) / activeMetrics.length) * 100);
+        document.getElementById('heroSummaryPill').textContent = `${heroPct}% ${t('todayProgress')}`;
+      }
+
+      function renderAll() {
+        renderWater();
+        renderTasks();
+        renderHabits();
+        renderGoals();
+        renderNotes();
+        renderShopping();
+        renderBudget();
+        renderDashboard();
+      }
+
+      // Initialize App
+      applyLanguage();
+      navigateTo(state.activeSection || 'dashboard');
+    })();
+  </script>
+</body>
+</html>
